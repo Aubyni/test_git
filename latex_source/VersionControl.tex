@@ -1,0 +1,193 @@
+\epigraph{entropy: \emph{noun}: lack of order or predictability; gradual
+decline into disorder}{\textit{Google Dictionary}}
+
+\par{
+Entropy of code is a known problem: over time, an unmanaged project will tend
+to disorder that is difficult to reverse. Version Control is the machine that
+projects use to fight back against entropy with clear processes. Just like
+thermodynamic systems, version control systems also require energy to run.
+However, unlike thermodynamic systems, it is typically a lower energetic cost
+to run the system than to let entropy take hold. We will embark on a thought
+experiment to illustrate why this is the case. 
+}
+
+\par{
+Imagine that you are a group of just three people working on an application.
+Fortunately, this application is written in just one language that all three
+people are reasonably familiar with. The goal of the application is to take a
+set of data in a known format and generate a "clean" version of that data. The
+mathematical principles are straightforward enough, and so it is implemented
+quickly. Then one day, a new method is discovered for cleaning the data. The
+group agrees that this change should be merged into the existing code.
+Suddenly, a horrible discovery is made: there are actually five versions of
+the code. There's programmer A's version that has a configuration unique to
+their system, programmer B's version which has a version good for one system
+and another version for their system at home, and you have a version that
+works on your system, plus some extra features that you thought would be neat.
+You then all independently attempt to solve different parts of this new method
+and integrate them into your codes, and figure that you can resolve the merge
+later because you are all very busy people with important things to do, and
+this is a simple problem to solve in a mythical future where there is more
+time to solve the problem.
+}
+
+\par{
+A few months later, it is discovered that all three of you are getting
+different results on the same data even though the algorihtm is purely
+deterministic. You get together and attempt to compare code to find the
+discrepancy. To your collective horror, it is impossible to align your source
+code because people have different functions in different places, slight
+tweaks in the middle of different functions, and no record of previous
+versions because they were backed up on some system long ago and overwritten.
+By your estimate, there are now at least nine versions of the code despite
+there only being three of you because there are intermediate versions of each
+person's code which may or may not align with other versions. What a disaster!
+Then, a new lab member comes along, picks one of the nine versions, and begins
+their own versions. In no time at all, nobody can tell which version is
+actually the correct one, and your boss is fuming because nobody can tell them
+what state the project is in, because you have to sheepishly ask, ``Which
+version?"
+}
+
+\par{
+I will assert, based on the fact that this is an actual true story that
+happened in my undergraduate lab, and something that I have commiserated with
+numerous other labs about, the following statement for the scaling of
+time spent managing code changes without version control:
+
+\begin{equation}
+t_{\text{NOVCS}} = k n^2
+\end{equation}
+
+with $t_{NOVCS}$ the time spent and $n$ the number of changes to be made, and
+$k$ the time spent for a single change. This
+is clearly not ideal. After the above thought experiment, let us consider a
+version-controlled alternative.
+}
+
+\par{
+Programmer A, B, and C are all working on the same code. They discuss who will
+work on what pieces, and each has a their own ``branch'' based off of a main
+repository that they all have permission to modify. When changes cause
+conflicts, it is immediatley evident and they discuss whose change should be
+retained. It is a huge headache because programmers A and B don't agree very
+often, and C just wants things done quickly, and there is some degree of
+bickering. In time, they integrate the new method to their existing repository
+and all three have an identical version. Their boss asks them how it works,
+and they begrudgingly say it's okay. 
+}
+
+\par{
+I will assert, again because the above is a real experience, that the
+following holds:
+
+\begin{equation}
+t_{\text{VCS}} = K n
+\end{equation}
+
+with $K > k$ the effort per change, and $n$ again the number of changes.
+Essentially, each change costs more time, but there are fewer changes to
+manage. This is the foundational argument that you bank on with a version
+control system: even though $K > k$, $n^2 >> n$, so that in the long run,
+
+\begin{equation}
+t_{\text{VCS}} << t_{\text{NOVCS}}
+\end{equation}
+
+One could argue that $n$ may be small for small projects, but practically
+speaking, the number of possible states for a program is large, therefore the
+number of possible changes is also large. 
+}
+
+\par{
+I would contend that the first thought experiment is an example of what I call
+``sinners in the hands of an angry system'': they have sinned by not
+organizing their code, and the system is angry because they cannot
+concentrate their code into one version. It is possible also with version
+control to become a sinner in the hands of an angry system, and I will point
+this out where I think that is a possibility. Mostly this happens when people
+stray from best practices, which I try to outline very clearly.
+}
+
+\par{
+Now that you've been convinced of the need for version control, let's discuss
+more precisely what it is. First, we'll define some terms:
+}
+
+\par{
+A \emph{patch} is a set of changes. Patches are involved at all stages of the
+version control process, and must be carefully managed and designed. 
+}
+\par{
+A \emph{branch} is a set of patches which, taken together, represent a large
+work unit. To explain the difference, consider implementing a calculator. A
+patch might be a new function to perform addition, but the branch which adds
+addition functionality might also include patches for parsing the + sign,
+handling errors, and even displaying the result properly. 
+}
+
+\par{
+Sometimes patches and branches can be much smaller: a patch might fix a bug, and a branch may
+simply represent that bugfix. Other times, a branch might be much larger than
+a single feature. On most systems, the branch which contains the current
+deployed version of an application is called \emph{master}. 
+
+\par{
+This is typically
+a heavily protected branch, with people waxing poetic on who should and should
+not have the ability to write to it, policies in place to avoid malicious
+attacks on it or even incompetent additions to it, and so on. Typically in
+open source projects, \emph{review} is the process by which a patch or branch
+is commented on by the project maintainers to ensure it is ready to add to the
+master branch. It is best practice to perform review for all changes.
+}
+
+\par{
+In a VCS, you typically want more than the ability to just add patches. It is
+useful to have tools to compare patches, manage the timing of access to the
+master branch so that patches are applied in the correct order, revert patches
+that are considered ``bad,'' and so on. Git offers more tools than any other
+VCS that I am aware of, and these tools generally work extremely well. I will
+briefly go over the main features of git conceptually, before going into the
+next chapter, where you will get your feet wet.
+}
+
+\par{
+Git is, at its heart, a database with near-instant access time to every entry.
+Each entry is stored as a \emph{hash}-- a globally unique identifier to a
+snapshot in time of the repository. Information is stored as hidden files and
+directories within the repository itself, which are then transferred to any
+clones of the repository. In git, you can create a new entry into its database
+by creating a branch or with a \emph{commit}-- a set of patches that you would
+like to be associated with a branch. Because access to any snapshot is
+effectively instantaneous, you can very quickly move between many different
+versions of the code. It is possible, in other words, to move instantaneously
+between any arbitrarily separated code states. You can switch easily between
+fixing a bug and adding a feature, between your version and someone else's
+version, and between stable and unstable code, without an appreciable cost in
+time or memory. For reference, git was designed to allow random access to any
+commit in under one second, specifically for the Linux kernel (roughly 15
+million lines of code!)
+}
+
+\par{
+With this flexibility at your fingertips, your ability to maneuver through
+changes is dramatically increased. You will discover that it is easy for two
+programmers to work on deeply intertwined pieces of code and immediately see
+the changes manifest and conflict. You can have multiple independent
+development projects occur in parallel and join them seamlessly in seconds,
+which uncover accidental conflicts just as quickly. When things must be
+reverted, it is done so in a non-destructive way because the database
+reference is updated with the reversion. You can tag important versions of the
+code, leave detailed messages explaining changes, and even rewrite history
+non-destructively (albeit carefully). 
+}
+
+\par{
+In summary, version control allows people to fight back against the entropy of
+code, consolidating all changes into one consensus-driven version. Because git
+is essentially a set of snapshots with near-instantaneous access, you can use
+it to instantly change between code versions. This allows you to, in practice,
+work on any set of problems with any number of people and instantly see
+conflicts, merging changes instantly where there are none. So let's get to it!
+}
