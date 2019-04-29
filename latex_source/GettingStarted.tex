@@ -1,0 +1,142 @@
+\epigraph{A journey of a thousand miles begins with a single
+step}{\textit{Laozi}}
+
+\section{Core Configuration}
+\par{
+To begin, we wil configure your very own git profile. Part of the joy of git
+is seeing who made the changes we're unhappy with, and so all commit authors
+are identified by their settings in their configuration. This is on a per-user
+basis, so that a system with multiple users will still allow different
+authors. So when we configure, we will use the ``global'' option, but that
+represents universality across repositories rather than across the system.
+First, let's see what's already in the global configuration.
+
+\begin{verbatim}
+cat ~/.gitconfig
+\end{verbatim}
+
+should bring up the global git configuration based on your home directory.
+This should work inside of windows git bash or any Unix-based system.
+You may see things like a filter section, a core section, and a path to a
+merge tool. If you haven't set up your name and e-mail already, then they will
+not be there. Let's add them with the following commands:
+
+\begin{verbatim}
+git config --global user.name "Joshua B. Teves"
+git config --global user.email jbtevespro@gmail.com
+\end{verbatim}
+
+The first command is \verb+ git +, which tells the
+operating system that you'd like to use the \verb+git+
+binary. The second option, \verb+config+ 
+tells the binary that you're interested in modifying a
+configuration of some sort, and \verb+--global+ specifies
+that this is the \emph{global} configuration we'd like to edit. 
+\verb+user.name+ indicates the section, separated by
+a period with the field, that should be filled. By default, name and e-mail
+are stored in every commit message. Note that if you're contributing to a
+public repository, this means that your e-mail address is publicly visible. 
+}
+
+\par{
+Now we've told git who we are. It would also be good to set some additional
+preferences. You will want to set a command-line-based text editor. I
+recommend \verb+nano+ if you don't work on the
+command line very much. If you're a command line wizard, then you should learn
+\verb+vim+ if you haven't used it already. To set
+your text editor preference, use
+
+\begin{verbatim}
+git config --global core.editor nano/vim
+\end{verbatim}
+
+We won't have a convenient way to test this for a little while, but we can
+check to make sure that the changes were written to the config file by using
+the previous \verb+cat+ command. Verify that this is the case. 
+}
+
+\section{Initializing a repository}
+\par{
+You will want to have a single folder as the top-level directory of your
+repository. I recommend that you use your home directory in most cases. Note
+that on Mac, Apple has seen fit to make Home difficult to accesss from Finder,
+making it difficult to attach contents in e-mails, etc. For this reason you
+may find it irritating to keep repositories in your home on Mac systems; I
+don't have a good recommendation for handling that, it's mostly just painful. 
+I do not recommend keeping your repositories on a cloud-synced folder such as
+Dropbox or Box Sync; it can cause some very strange issues for
+synchronization, and hidden files are not handled well. Thus, I recommend
+avoiding such a configuration. When you've selected a suitable location,
+create a folder called \verb+HelloWorld+ and navigate to it like this:
+}
+
+\begin{verbatim}
+mkdir HelloWorld && cd HelloWorld
+\end{verbatim}
+
+\par{
+From there, you will want to initialize a git repository. Note that if you
+don't initialize a folder as a git repository, then there is no database for
+git to allow you to make changes, understand where changes should go, or
+history record to look at and verify. Therefore, almost all non-global git
+commands would fail. Initialize your repository via
+}
+
+\begin{verbatim}
+git init
+\end{verbatim}
+
+\par{
+You should get a message informing you that the initialization was successful.
+If you were to attempt to initialize a git repository as a subfolder of an
+existing repository, you would potentially get an error or worse, create a
+confusing database enmeshment that is impossible to entangle. For this reason,
+you should not put git repositories inside of each other, or you will be a
+sinner in the hands of an angry system!
+}
+
+\section{Cloning Repositories}
+
+\par{
+It is also possible to clone repositories. This is useful when you want to
+collaborate with others or work off of existing projects; in other words, the
+overwhelming majority of the work that you'll be doing. A clone allows you to
+identically replicate the entire history of a project, with all snapshots of
+all code states. This is extremely useful for testing, debugging, and
+referring to older versions. One advantage of git is that it is a
+``distributed'' version control system, which means that each person working
+has their own copy of a repository. This allows each person to instantaneously
+access snapshots without having to wait for a server to retrieve them. This
+will be discussed in much deeper detail later; for now, understand that it is
+the nomenclature is correct: you do indeed have a complete clone of a
+repository when you run this command. Though you don't yet know how to make
+changes in get, for practice, let's go ahead and try to clone a repository.
+Be sure to leave your present repository, and then run
+}
+
+\begin{verbatim}
+git clone git@github.com:jbteves/test_git.git
+\end{verbatim}
+
+\par{
+Enter the directory, and list the files. You should see the entire contents of
+this test repository. In fact, if you were to poke around, you would find this
+file (\verb+GettingStarted.tex+)! 
+One of the wonderful things about a git repository is that you can
+package all related materials together. For now, we won't mess very much with
+this repository, but it's good to see how to properly clone a git repository.
+Note that if you were to just copy and paste the contents, the git database
+would not migrate properly because it's a hidden directory on most Unix
+systems. Cloning guarantees that all of the database is transferred correctly
+with all history-- this is why straight downloading is not available on sites
+like GitHub; you could very easily mangle the code with no recourse.  
+}
+
+\par{
+Feel free to poke around the repository's components, but the important thing
+is that it appears just like any other collection of files. You can view them,
+edit them if you like (though I don't recommend that right this second), and
+even compile the \LaTeX source. In other words, it's just like any other
+folder full of files on the surface. Once you're convinced of this, return to
+the repository that you initialized yourself.
+}
