@@ -181,8 +181,23 @@ your commit changed 1 file, and gives the \emph{hash}: an ugly-looking
 hexadecimal value. This is the reference that you can use to get to that
 snapshot. Don't worry about keeping track of it for now, it's there mostly to
 let you know if you want to re-access it soon after the commit. Over time, you
-will build a history of commits that you can reference.
+will build a history of commits that you can reference. Each entry in the
+history is a pointer to a snapshot in the database, along with the difference
+between it and the previous commit, so that \verb+git+ can manage changes
+between commits. See Figure \ref{fig:commit_example} for a visual aid.
 }
+
+\begin{figure}
+    \caption{
+        Successive commits and what they refer to.
+        Black arrows and alphabetical order show you commit order.
+        Blue arrows are drawn from the commit to what they represent in the
+        database. White boxes are snapshots and green boxes are differentials.
+    }
+    \label{fig:commit_example}
+    \includegraphics[width=\textwidth]{commit_example}
+\end{figure}
+
 
 \par{
 Let's make some more changes to our file. Add the line, ``What a wonderful
