@@ -1,0 +1,707 @@
+\epigraph{They always say time changes things, but you actually have to change
+them yourself}{\textit{Andy Warhol}}
+
+\section{Staging Changes}
+\par{
+It's great to hear about how git can theoretically help manage changes, but we
+have yet to actually change anything. This is something of a bummer, so let's
+try making some changes. Make sure that you're in the repository you've
+initialized (not the one you cloned) and run \verb+ls+. You will note that
+there's nothing there at all, because git uses hidden files and folders to
+store its data in order to avoid distracting you. It's very polite that way.
+Moreover, there's not much interesting in there yet because there are no
+changes. Using a command-line editor of your choice, create a file called
+\verb+hello.txt+ with ``Hello, world!'' as its only contents.
+}
+
+\par{
+Right now, your file is part of the working area. In the working area,
+everything is exactly as it appears. You can read and write in a text editor
+as usual, run scripts, compile code, etc., and whatever is in the working
+directory is reflected in those operations. However, before any changes can be
+added to the database, they must first go to the \emph{staging area}. This is
+essentially where your patches go for you to review and be sure that you want
+them before you enter them to the database. In the case of our file, there is
+nothing yet staged because we haven't asked git to do so. Our repository is
+also empty, so any changes are going to be ``untracked''-- they are neither
+part of the database nor even staged to do so. You can always tell the status
+of your changes by running
+}
+
+\begin{verbatim}
+git status
+\end{verbatim}
+
+\par{
+which say the following:
+}
+
+\begin{verbatim}
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	hello.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{verbatim}
+
+\par{
+So \verb+git+ is telling us what branch we're on (much more on that later),
+that we have no commits, and that hello.txt is untracked. Again, this means
+that there is no record in any part of the database that this change exists.
+The only reason git knows that it exists is because there is a discrepancy
+between the database, which records this repository as being empty, and your
+working area, which has a file with contents in it. Note that \verb+git+
+helpfully tells us the command for staging files: \verb+git add+. Go ahead and
+stage your file via
+}
+
+\begin{verbatim}
+git add hello.txt
+\end{verbatim}
+
+\par{
+Now run \verb+git status+ again. 
+You should see that there is now a ``Changes to be
+committed'' field, which has \verb+hello.txt+ listed. 
+This is a lot of text for the amount of information we want to know, which is,
+``Did my change get staged or not?'' To see an abbreviated version, run 
+}
+
+\begin{verbatim}
+git status -s
+\end{verbatim}
+
+\par{
+This should note that \verb+hello.txt+ is added via the ``A'' identifier. For
+a complete listing of abbreviated status identifiers, check out Table
+\ref{tbl:status}.
+}
+
+\begin{table}
+\centering
+\begin{tabular}{c | c}
+\hline
+\hline
+Abbreviation & Meaning \\
+\hline
+A & Added \\
+M & Modified \\
+D & Deleted \\
+R & Renamed \\
+C & Copied \\
+U & Updated; Unmerged \\
+'' & Unmodified \\
+! & Ignored \\
+? & Untracked \\
+\hline
+\hline
+\end{tabular}
+\caption{The git status abbreviated meanings. Source: https://git-scm.com/docs/git-status}
+\label{tbl:status}
+\end{table}
+
+\par{
+Before we proceed, it's worth discussing why a staging area is important.
+Staging areas are great for making sure that your commits are clean, and that
+any changes you made are correctly grouped. There are a variety of tools that
+\verb+git+ supplies to aid with this, but our current repository isn't yet
+full enough to explore them. For now, it's sufficient to say that a staging
+area is like a record of what you think you want to do. Now comes what to some
+people is the scary part: \emph{committing}.
+}
+
+\section{Commiting Changes}
+
+\par{
+Committing changes is not actually all that scary, which I hope will be well
+demonstrated in the coming chapters. However, this is a formal entry into the
+database, which means that your choice is discoverable. If it's a bad change
+that means someone can find it and blame you for it. I think this is a very
+negative outlook, however. It is impossible to produce perfect code with every
+commit, or even good code, and the facilities exist to undo the commit quite
+easily, in fact. Therefore, think of a commit more passively than the word
+implies: it is merely a snapshot in time of what you think is the best idea
+you have for how things should take shape. It may be wrong, it may be
+incomplete, but it is a defined entry you can fall back in if you start moving
+in the wrong direction. For this reason, commit early and often. Here are a
+few guidelines for making good commits:
+}
+
+\begin{enumerate}
+\item Leave useful messages, usually in the present passive voice (e.g.,
+``Adds a file''
+\item Keep related, dependent changes inside of the same commit
+\item Keep unrelated changes in separate commits
+\end{enumerate}
+
+\par{
+Later, we'll take a deeper dive into items two and three, but for now, we'll
+focus on ``useful messages.'' Prepare to use a text editor, and run
+}
+
+\begin{verbatim}
+git commit
+\end{verbatim}
+
+\par{
+This will fire up your selected text editor. All lines with \# will be
+ignored. The first line is supposed to be a summary, limited to 72 characters
+ideally. The body below the comment block will be a more detailed message.
+Again, individual lines should try to avoid being larger than 72 characters.
+In \verb+vim+, you can enforce this with \verb+set textwidth=72+ in your
+\verb+.vimrc+. While in your editor, try to leave a useful summary in the top
+line. Just make sure it's useful. Here are some examples of useful and
+un-useful commit summaries:
+}
+
+\begin{enumerate}
+    \item ``Makes the git boot camp drill instructor happy'': fails to say
+    what the commit actually \emph{does}, which is to add a file that says
+    hello.
+    \item ``Created file that says hello'': is okay, but does not use the
+    present passive voice. 
+    \item ``Adds a file in plain text that has the words Hello, world in it in
+    a file called hello.txt'': is too verbose, exceeding our 72 character
+    limit. It's also needlessly detailed for a summary.
+    \item ``Adds a file that says hello'': is good, saying quickly what the
+    changes do. 
+    \item ``Initial commit: adds a file that says hello'': is good, optionally
+    adding the detail that this is the first commit in the repository; some
+    people prefer this to be noted, others don't. 
+\end{enumerate}
+
+\par{
+Save and quit from your text editor, and you will get a message saying that
+your commit changed 1 file, and gives the \emph{hash}: an ugly-looking
+hexadecimal value. This is the reference that you can use to get to that
+snapshot. Don't worry about keeping track of it for now, it's there mostly to
+let you know if you want to re-access it soon after the commit. Over time, you
+will build a history of commits that you can reference.
+}
+
+\par{
+Let's make some more changes to our file. Add the line, ``What a wonderful
+world.'' just after the original line. We'd like to see how that changes all
+of our snapshots in comparison to before; surprisingly, there's a lot going on
+after this small change. Run \verb+git status+ again, and we'll see that this
+time \verb+hello.txt+ is modified rather than untracked. That's because
+\verb+git+ knows now that we have that file in our database, so any version
+which differs is a set of patches on an existing file rather than something to
+be ignored. More compactly, we can see that as an ``M'' if we use \verb+git status -s+ again. 
+Let's say that at this point, you're distracted by some
+paperwork and spend an agonizing ten minutes hashing it out over the phone
+with HR. You return to your seat, and see that you've modified something, but
+you're just so enraged that your memory of what you did is completely purged.
+You'd like to know before you go around staging and committing things. How can
+you see that quickly? Run
+}
+
+\begin{verbatim}
+git diff
+\end{verbatim}
+
+\par{
+You should see that we have the original file, and a line starting with a plus
+before our newest addition. Neato! We decide that this is all we really
+wanted, and it's time to stage it, so we do. If we run \verb+git diff+ again,
+we'll see nothing. This is because even though the change isn't committed,
+it's at least stage, so \verb+git+ figures we already know about that change.
+Let's see that we get distracted again. This time, maybe you have to run to a
+meeting that should have been an e-mail, just as soon as you had relaxed from
+the paperwork fiasco. You return to your desk and re-run \verb+git status -s+
+to remind yourself what was hapenning before the meeting. We see that
+\verb+hello.txt+ was modified, but now the change is green instead of red (on
+most systems; some systems don't support color highlighting). This is because
+the change is now staged, and therefore at least partially tracked. We're
+frustrated because we don't remember what we changed, and \verb+git diff+
+won't tell us. No need to fear; we can see how the staged version compares to
+the previous commit via
+}
+
+\begin{verbatim}
+git diff --cached
+\end{verbatim}
+
+\par{
+We are reminded yet again of what's hapenned. Ah, peace at last. We got to
+stage it when suddenly somebody sends you a message, urging you not to put
+exclamation points in your text files because that makes them too exciting for
+work. After a heated debate, you find yourself forced to fix this as well.
+With a grumble, you edit the file to switch the ! to a . Do this now in your
+editor, and do another status check.
+}
+
+\par{
+Much to your chagrin, you will see that you have a \emph{red} indication that
+\verb+hello.txt+ was modified, and a \emph{green} indication as well. This
+means that you have staged some changes in hello.txt and not others.
+\verb+git+ has kindly alerted you to this automatically. Note that this
+highlights something fundamental about git: you are staging \emph{patches},
+not \emph{files}. Therefore, once you make changes to the file, there are
+actually two versions in play: the version in your working area, and the
+version that is staged. We can use \verb+git diff+ to help us tease apart
+these different versions. Go ahead and run it with and without
+\verb+--cached+. Note that the differences between staged changes and working
+area are still tracked: without \verb+--cached+, we see the differences
+between the working area and the staging area, and with it, we see the
+differences between the previous commit and the staging area. Be careful when
+using git diff to understand the differences. 
+}
+
+\par{
+Now it's time to commit. Before you go and stage that change from . to !, ask
+yourself if the commit fits our criteria for a \emph{good} commit. The simple
+answer is no: that change is independent of our saying that it's a wonderful
+world. Therefore, we should go ahead and commit our addition, then separately
+stage and commit the other change. We can use a special flag for \verb+git commit+ 
+to just apply a summary message; these are pretty straightforward
+changes. You can do this via
+}
+
+\begin{verbatim}
+git commit -m "Message in quotes here"
+\end{verbatim}
+
+\par{
+Since we already gave the commit a summary, the text editor won't launch;
+\verb+git+ already has all of the information it needs and it commits more or
+less instantly. Then we can stage and commit our punctuation change
+separately; go ahead and do so. 
+}
+
+\par{
+We're feeling singsongy today, so we decide to add another line of Louis
+Armstrong's masterpiece. Go ahead and add the line ``I think to myself, what a
+wonderful world.'' below the others and stage the change. Just as you're about
+to commit, however, your nemesis, taker of the exclamation point, announces
+that you're limited to one song lyric per file. Ridiculous! But you must
+comply. How do you unstage it? To unstage all changes is straightforward: run
+}
+
+\begin{verbatim}
+git reset -- *
+\end{verbatim}
+
+\par{
+This tells \verb+git+ to reset, \verb+--+ meaning to do so without modifying
+the working area, and \verb+*+ telling it to reset all files.
+\verb+git+ will announce that it unstaged changes, and that it un-modified
+your modifications to \verb+hello.txt+ using the abbreviated git status
+notation. A quick check on the file, however, notes that despite being
+unstaged, the file is still unchanged in the working directory. You can check
+that out with \verb+status+ again. Often times when you get to the point of
+staging things, you would like to keep those changes somewhere. Instead of
+discarding them entirely, you can use
+}
+
+\begin{verbatim}
+git stash
+\end{verbatim}
+
+\par{
+This will place the changes in a ``stash'' that can be applied later if you'd
+like the changes back. Run the command, and you'll see that afterwards the
+changes are not applied. You can see all of your stashes via
+}
+
+\begin{verbatim}
+git stash list
+\end{verbatim}
+
+\par{
+You can then re-apply the stashes via
+}
+
+\begin{verbatim}
+git stash apply index
+\end{verbatim}
+
+\par{
+with index the number of stash (enclosed in curly braces when listed). 
+When you apply it, it remains in the list. You can remove the stash via
+}
+
+\begin{verbatim}
+git stash drop index
+\end{verbatim}
+
+\par{
+To perform both of the above in the same move for the most recent stash, you
+can run
+}
+
+\begin{verbatim}
+git stash pop
+\end{verbatim}
+
+\par{
+Stashes are incredibly useful for experimenting with different changes in a
+well-recorded and systematic manner; just make sure to clean out stashes as
+they become outdated or unnecessary. For now we can just leave it stashed.
+}
+
+\par{
+If we want to return the file to its previous commit state completely, even in
+the working area, we can do a reset with the \verb+--hard+ argument. It is
+worth noting that you should be very sure you want to do this, as your changes
+will be completely lost. If you create important changes and then use a hard
+reset, you will lose them and then be a sinner in the hands of an angry (and
+unforgiving) system. If you think there's even a chance at that patch's
+usefulness, stash it. Practice a hard reset by applying (not popping) the
+stash and then run
+}
+
+\begin{verbatim}
+git reset --hard
+\end{verbatim}
+
+\par{
+This puts you back to the previous commit in both your working and staging
+area. Note that your stashed changes survive, so you can recover them in the
+event of a hard reset.
+}
+
+\section{Git History}
+\par{
+Soon after we've made those changes, a moment of justice occurs. Flanked by the
+person who insisted that exclamation point was impermissible, your boss
+approaches you and says that exclamation points are in fact okay (because
+duh). After savoring some sweet justice and drinking in the apology of the
+person who tried to pry away the joy expressed in just a handful of computer
+bits, you would like to put the exclamation point back. You \emph{could}
+simply change the punctuation back and re-commit it, but that's not a good
+expression of what happened. Instead, you should \emph{revert} that change to
+make it clear that you're undoing something that should not have been done.
+Before we can do that, though, we need to make sure we can access that commit.
+There's a simple way to do that. Run
+}
+
+\begin{verbatim}
+git log
+\end{verbatim}
+
+\par{
+You should see three commits there. Each one has a \emph{very long}
+hexadecimal hash, an author (that's you), an e-mail address, a date, and the
+messages associated with those commits. This provides you, at a glance, with
+the information you need to find a change, who made it, and how to contact
+them, as well as when it was introduced. It cannot be understated how valuable
+this is. It will become apparent when you work on software with more complex
+bugs how useful it is to track down \emph{when} a problem was introduced and 
+\emph{who to ask about it}. Nonetheless, for our purposes this is a lot of
+information. It would be nice to see a lot less information: just the summary
+message and each commit's hash. We can do that via
+}
+
+\begin{verbatim}
+git log --pretty=oneline
+\end{verbatim}
+
+\par{
+This is much cleaner. However, we see that there is this parenthetical that
+isn't part of our message: \verb+(HEAD -> master)+. This is telling you what
+commit you're comparing your staging and work area to right now (HEAD), and
+what branch it's pointing at (master). This will be valuable when we discuss
+branching later. This clean version is much easier to parse, but I actually
+still think it's a bit much. Personally, I've added an alias called ``slog''
+that prints out a shorter (7-character) version of the hash and the message in
+red and green, respectively. If you would like to make a detour to use this
+macro, paste the following into your terminal:
+}
+
+\begin{verbatim}
+git config --global alias.slog 'log --pretty="%C(red)%h %C(green)%s"'
+\end{verbatim}
+
+\par{
+This basically tells git to post the short commit hash in red next to the
+short message in green. 
+
+\par{
+Now that we can slog through the git history, it's straightforward to find the
+commit we'd like to revert. Find it, and copy its short hash (this is easier
+on some terminals than others). We can revert it via 
+}
+
+\begin{verbatim}
+git revert hash
+\end{verbatim}
+
+\par{
+When you do this, your text editor will launch and prompt you to enter a
+commit message. It is already populated with a message indicate that this
+commit is a special revert commit, including the old message and hash. You can
+add a rationale below the comment block. Go ahead and add something like,
+``Reverted due to our boss overriding a silly rule that prohibited ! in text
+files.'' Write and exit from your text editor, and a new commit will be
+generated reflecting these changes. The commit is reflected when you run
+\verb+git log+. Let's say you want to view only the last commit (which is
+fairly common) and you want to see all of the details. You can add the
+argument \verb+-n+, with \verb+n+ the number of commits you'd like to view in
+reverse chronological order. Note that this is compatible with the
+\verb+slog+ alias, too, since it's just an alias for the \verb+log+ command. 
+}
+
+\par{
+Let's say that we want to go back our commit where we've added our wonderful
+world message, before all of the ! nonsense, instead of reverting. There can
+be cases where this is useful, but I will caution you: this is an easy way of
+becoming a \emph{very bad} sinner in the hands of a \emph{very angry} system.
+The first way is not so bad: you can do a ``soft'' reset, where you keep the
+code in the last commit but set the HEAD (a pointer to where you are in git
+history) to a previous commit. You can do this via
+}
+
+\begin{verbatim}
+git reset --soft hash
+\end{verbatim}
+
+\par{
+When you do this, however, you will quickly discover why it is so easy to
+become a sinner in the hands of an angry system in this way. When you check
+the history log, you will see that your previous two commits are gone, and
+there are no changes in the file. Why? All you did was make a change and
+revert it, so there are no changes to stage. As far as git is concerned, the
+state of this snapshot is no different from how it was before the reset. While
+it is possible to recover the fact that you made a change and canceled, it is
+quite perilous if you're making more complex changes. Fortunately, in this
+case it's not so bad. You can run
+}
+
+\begin{verbatim}
+git reflog
+\end{verbatim}
+
+\par{
+And you'll see all of the positions that HEAD has been at. You can then reset
+to one of those hashes; in this case, you'll want to reset to the hash where
+we were at the revert commit. Having done this, you will recover the history
+and averted disaster. However, it should be easy to see how such operations
+could lead to fairly complicated and irritating situations. As a rule, you
+should always commit a subtraction of information or revert a commit instead
+of performing a reset. You can avoid catastrophe through the use of branches,
+which will be discussed in detail in the next chapter.
+}
+
+\par{
+While we're poking around, let's go ahead and add another lyric to our file, 
+``Is there anybody out there?''
+Go ahead and insert that line below ``Hello, world!'' and commit that change.
+As soon as we do that, we hear more clomping of feet. It's the boss and our
+old nemesis, again full of contrition. You are indeed allowed to add more than
+one line of lyrics per song, and so you want to apply that stash that you had
+from earlier in the staging section. Because \verb+git+ is superlative at
+keeping all of these things in a database, your change is still stashed and
+you can see it. Go ahead and pop it, and you will see that the change is
+correctly placed in the position below ``What a wonderful world.'' This is
+amazing in some sense: we have beaten this poor git log with all sorts of bad
+choices in the last few commands, nearly shot ourselves in the foot, and
+trusty \verb+git+ has delivered to us a perfect reconstruction of our desired
+text file in spite of all of this. Amazing! Go ahead and commit the result.
+}
+
+\par{
+We take a look at our file, reviewing carefully (as all good programmers
+should) and notice that there's something slightly confusing: we have two song
+lyrics that are practically on top of each other. Reformat the file so that
+each song is labeled and separated by whitespace both before and after that
+song, and indent the lyrics. Commit these changes, and view your git log. We
+now have 7 different snapshots in time of the file, and an even larger number
+of different HEAD positions that have been recorded in ``reflog.'' We have
+also used stashes and reversions to reconstruct precisely the file we want,
+with a record of all changes that have been made, with a handful of commands.
+That's fairly incredible.
+}
+
+\par{
+For a final set of changes to demonstrate \verb+git+'s flexibility, we're
+going to note that at this point there are more song lyrics than hellos in
+this file. Let's plan to get rid of the ``Hello, world!'' and move it to a new
+file, README.md (every repository should have one!)
+Go ahead and first delete that line from \verb+hello.txt+ and the whitespace
+after, then commit that change. Now rename the file to \verb+lyrics.txt+ and
+run \verb+git status+. We see that the file \verb+hello.txt+ is deleted and
+that we now have an untracked file, \verb+lyrics.txt+. This isn't right-- all
+we did was rename the file! Fortunately, there's an easy fix. Do a hard reset
+via
+}
+
+\begin{verbatim}
+git reset --hard
+\end{verbatim}
+
+\par{
+You should now be at the previous commit, having discarded this change that we
+don't like (we could have stashed it to be cautious, or used \verb+--soft+ to
+keep the changes in the staging area, at least, but we were positive we didn't
+want things recorded this way). Fortunately \verb+git+ comes with a facility
+to rename things. Just run
+}
+
+\begin{verbatim}
+git mv hello.txt lyrics.txt
+\end{verbatim}
+
+\par{
+When you run git status this time, you should see that \verb+git+ now knows
+that the file was simply renamed. Go ahead and commit this change-- that's
+what we wanted to begin with. Though it seems pedantic to do this, it
+dramatically eases workflow if we have a proper record of what we did, as we
+saw when we attempted resetting to different commits earlier.
+Keeping the log clean with good commits is the easiest way to manage code and
+avoid becoming, as you tire of reading, a sinner in the hands of an angry
+system.
+}
+
+\par{
+As a final addition, create a file \verb+README.md+ with ``Hello, world!'' and
+commit it. When you've done this, run 
+}
+
+\begin{verbatim}
+git rebase -i HEAD~9
+\end{verbatim}
+
+\par{
+You will be presented with a list of all of your short commit hashes and their
+messages, with a keyword ``pick'' in front of all of them. There are numerous
+things you can do to manipulate the commits listed in the comment block below.
+Note that unlike the log you get on the command line, the commits are not in
+reverse order. You can now easily amend your history. After a great degree of
+soul searching, you have decided that you can erase the part of history where
+! was changed to ., and you'd like to amend the first commit message to start
+with ``FIRST:''. To do these things, replace \verb+pick+ on line 1 with
+\verb+reword+ and replace lines 2 and 3 with \verb+drop+. Even more
+sophisticatedly, you'd like to make the file split into lyrics and README to
+be conducted in one fell swoop; after all, we broke a rule when we deleted
+``Hello, world!'' in one commit and added it back in another: those changes
+are mutually dependent. To do that is more convoluted, but we essentially
+want to amend our commit message from where we removed ``Hello, world!'' into
+something representing the file split, and we want to \verb+squash+ the other
+changes into it-- in order words, the commits that happened afterwards will be
+merged into a single commit, with an amended message to reflect all of the
+conatained changes. To do this, replace \verb+pick+ on line 6 where the
+message is removed with \verb+reword+, similar to above, and replace
+\verb+pick+ with \verb+squash+ on the two commits below it. After verifying
+that this is all correct, save and quit your editor.
+}
+
+\par{
+Your editor will then launch a new window, asking you to amend the commit
+message for the first ever commit. Add ``FIRST'' before the original message,
+then save and quit. You'll be brought to the commit where you deleted ``Hello,
+world!'' and you should modify the message to represent all of the changes.
+Add a body to explain the changes' rationale as well as a summary. When finish
+this, the editor will pop up a third time asking you to merge all of the
+commit messages. This gives you a chance to verify your message that you
+reworded previously. Delete the other messages and move the body of your
+reworded commit down to the bottom. After this, you should get a message
+saying ``Successfully rebased and updated refs/head/master,'' indicating
+success. If something goes wrong, it may be easiest to simply do a hard reset
+and try again. Check your files and git log. If there is anything wrong, use
+the reflog to try and get back to your previous head, and then try again.
+If you ever want to modify just the last commit message, you can just run
+}
+
+\begin{verbatim}
+git commit --amend
+\end{verbatim}
+
+\par{
+Now you know how to access and even modify your git history. Just remember to
+be cautious, so that you do not become a sinner in the hands of an angry
+system.
+}
+
+\section{Interactive Modes}
+
+\par{
+Sometimes files get big. Really, really big. Then you'll go to make changes,
+and there will be changes all over the place that are in disparate locations.
+Then you will go to stage them, and realize you're about to commit changes
+that do completely different things. Obviously, this violates our rules about
+commits, so we should stage and commit them separately. Otherwise, we will be
+(say it with me) sinners in the hands of an angry system, because we will have
+changes that are difficult to revert. Previously, we used the flag \verb+-i+
+with \verb+rebase+. This is an example of an interactive \verb+git+ program.
+While it can be useful for amending history, it can also be useful for writing
+it to begin with! In your companion repository, there is a file,
+\verb+big.txt+. Copy it into this repository; the following command should
+work if you followed instructions at setup:
+}
+
+\begin{verbatim}
+cp ../test_git/big.txt .
+\end{verbatim}
+
+\par{
+Commit the file, and then take a look at it. Correct all of the lyrics errors,
+then run
+}
+
+\begin{verbatim}
+git add -p big.txt
+\end{verbatim}
+
+\par{
+This will interactively present ``hunks'' of code to you for you to
+selectively stage. First stage only the hunks of ``Row, row, row your boat''
+by saying ``yes'' to the first hunk, and ``no'' to the second. Check the git
+status to verify that you have some changes staged and some not. Once you've
+verified that, commit the first change, noting that the correction is only for
+Row, row, row your boat. Checking the workign area and the status should
+verify that this was successful. 
+}
+
+\par{
+You can actually edit to an even more precise level than the ``hunk'' provided
+to you by git (which is itself actually based off a tool called ``diff''
+provided by GNU}). Re-run the interactive patching program, but when the hunk
+comes up, enter \verb+e+ instead for edit. This should launch your editor, and
+provide you with instructions for how to edit. Essentially, you want your
+changes to reflect how they would look if you ran \verb+git diff+. Therefore,
+deleting a line with + equates to removing an insertion that you had put in,
+and replacing a - with a space means to leave that line alone. 
+Go through and edit the patch
+so that only corrections are made for lines with the word spider.
+Commit these changes, then commit the remaining corrections separately.
+}
+
+\par{
+Git offers many interactive facilities similar to this. For a more complete
+staging menu, including unstaging and individual file manipulation for many
+files, you can use
+}
+
+\begin{verbatim}
+git add -i
+\end{verbatim}
+
+\par{
+Follow the instructions similar to interactive staging. Any time a line
+appears with a star, simply press enter to confirm that that is the file you
+want to interactively manipulate.
+}
+
+\par{
+These interactive tools are substantially
+more precise than GUIs: note that even GitKraken, as of now one of the best
+git GUIs, fails to allow users to stage lines at the sub-hunk resolution.
+It is no slower to respond y/n to hunks on the command line, so a GUI with
+less functionality is at best a pretty memory hog and at worst encourages
+users to create bad commits that entangle disparate issues. 
+Moreover, many command line tools exist for debugging, compiling, running
+scripts, and more, which cannot be done from inside most git clients. In
+contrast, command-line git can be rolled into whatever existing command-line
+tooling you're using. I will note, however, that on Windows machines, the
+interactive git command line is much slower than on Unix machines for reasons
+beyond my comprehension. I often wonder if the poor Windows developers
+are forced to 
+\href{https://en.wikipedia.org/wiki/Eating_your_own_dog_food}{eat their own dog food}
+instead of using the high-quality command line tools that Unix users enjoy. 
+}
