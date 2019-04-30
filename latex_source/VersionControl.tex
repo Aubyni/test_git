@@ -59,7 +59,8 @@ time spent managing code changes without version control:
 t_{\text{NOVCS}} = k n^2
 \end{equation}
 
-with $t_{NOVCS}$ the time spent and $n$ the number of changes to be made, and
+with $t_{NOVCS}$ the time spent witout version control 
+and $n$ the number of changes to be made, and
 $k$ the time spent for a single change. This
 is clearly not ideal. After the above thought experiment, let us consider a
 version-controlled alternative.
@@ -85,7 +86,8 @@ following holds:
 t_{\text{VCS}} = K n
 \end{equation}
 
-with $K > k$ the effort per change, and $n$ again the number of changes.
+with $t_{\text{VCS}}$ the time spent making changes with version control, 
+$K > k$ the effort per change, and $n$ again the number of changes.
 Essentially, each change costs more time, but there are fewer changes to
 manage. This is the foundational argument that you bank on with a version
 control system: even though $K > k$, $n^2 >> n$, so that in the long run,
