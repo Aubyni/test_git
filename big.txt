@@ -1,0 +1,18 @@
+Row, Row, Row Your Boat:
+    Row, row, row your git,
+    Gently down the branch,
+    Merrily, merrily, merrily,
+    Life is but a dream.
+
+Mary Had a Little Lamb:
+    Mary had a little lamb,
+    Little lamb, Little lamb,
+    Mary had a little lamb
+    Whose fleece was white as snow.
+
+The Itsy-Bitsy Spider:
+    The itsy-bitsy commit,
+    Went up the water spout.
+    Down came the dev and made another bit,
+    Up came the sun and dried up all the rain,
+    But the itsy-bitsy spider crawled up the branch again.
