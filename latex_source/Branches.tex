@@ -1,0 +1,648 @@
+\epigraph{The connection between the language in which we think/program and
+the problems and solutions we can imagine is very close.}
+{\textit{Bjarne Stroustrup}}
+
+\section{Basics}
+\par{
+Branches are, in tandem with commits, one of the fundamental nouns in the
+\verb+git+ language (though the developers would probably prefer ``framework''
+to language). In spite of this, they communicate huge amounts of information
+in just a few bytes of data. A branch is essentially a stream of commits with
+a link to its genesis and a link to its future. Branches may be spun off from
+any commit, and consequently may be spun off from each other with relative
+impunity. They cost nearly nothing to make, often little to merge, and only
+cause conflicts when people have disagreed on some part of a program-- thus,
+they do not create more work than already existed once they are learned.
+}
+
+\par{
+We will have another thought experiment. Imagine that you are working on a
+script which will analyze some data, but there is a huge caveat: you're not
+actually sure what each part of the script will do specifically. Even worse,
+you won't be able to fill in the blanks in order because you're just not sure
+which problems you'll solve first. Without branching, you have a nightmare:
+you're going to have to commit various works in progress on top of each other,
+with a mess of spaghetti code that will tangle and stall until you find
+yourself ready to throw the computer out of the window. It would be nearly
+impossible to reconcile the gradual progress as each independent component is
+changed independently. However, with branches, we may apply the following
+workflow:
+}
+
+\begin{enumerate}
+    \item Create a skeletal structure
+    \item Commit the skeletal structure
+    \item Create a branch for each feature to be filled in
+    \item As features are tested and validated, merge them into the ``master''
+    branch
+\end{enumerate}
+
+\par{
+We will now consider a more concrete example. Let's say we would like to
+create a recipe book with three recipes: one for macaroni and cheese, one for
+rice, and one for chocolate chip cookies. We are constrained to only one file
+for the recipe, because some automated system will only read one file per
+author and therefore we want all of the credit. Following the above workflow,
+we can conceive of the following set of steps:
+}
+
+\begin{enumerate}
+    \item Create the file for the recipes and place headers for each dish
+    \item Create a branch off of that version of the file for each recipe
+    \item As recipes are completed, merge them into the master branch
+\end{enumerate}
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=\textwidth]{branching_example.pdf}
+\caption{Figure demonstrating the branching workflow for our recipes.
+Within-branch commits are blue, branching-off commits are black, and merge
+commits are red. Chronological order follows alphabetical order.}
+\label{fig:branching_recipe}
+\end{centering}
+\end{figure}
+
+\par{
+From Figure \ref{fig:branching_recipe}, you can see this workflow as an
+example. Each recipe has its own branch available, and they are independent.
+When they are each merged into master, the recipe file is gradually built.
+Note that commits I and J also have I' and J', because the branches build on
+top of previous merges as they are merged into master.  
+}
+
+\par{
+Let's walk through this example. First, create a new file, \verb+recipe.txt+
+which has a header for each recipe and whitespace after it. It should look
+like this:
+}
+
+\begin{verbatim}
+Macaroni and Cheese:
+
+Rice:
+
+Chocolate Chip Cookies:
+
+\end{verbatim}
+
+\par{
+Commit these headers, and then prepare for git branching. Right now, HEAD is
+at the ``tip'' of master (the latest commit to to master is always the
+``tip''). Now, to create a new branch, you can run run:
+}
+
+\begin{verbatim}
+git branch macaroni
+\end{verbatim}
+
+Now run
+
+\begin{verbatim}
+git branch
+\end{verbatim}
+
+\par{
+This shows you all branches that exist and which branch you're currently on,
+marked with an asterisk and usually highlighted in green. Note that this means
+that despite the fact that we've created a new branch, we're not in it yet.
+Run
+}
+
+\begin{verbatim}
+git checkout macaroni
+\end{verbatim}
+
+\par{
+You can if you re-run \verb+git branch+ that you are now in the
+\verb+macaroni+ branch. Now that we are in the macaroni branch, check the git
+log. You will notice that now it indicates that you are on master \emph{and}
+macaroni. This is because both branches' tip is at the same spot. Add the
+following to your recipe file (note that the header is tabbed from the left):
+}
+
+\begin{verbatim}
+    Ingredients:
+        Noodles (preferably corkscrew)
+        Cheese
+        Butter
+        Water
+\end{verbatim}
+
+\par{
+Commit this list of ingredients and re-run your git log. Now, HEAD points to
+macaroni, the branch you're on, and you can see that master is one commit
+behind your current branch. Now, we want to add instructions. We're going to
+be uselessly vague; copy the following below the recipe:
+}
+
+\begin{verbatim}
+    Directions:
+        1. Boil water
+        2. Put noodles in water
+        3. Strain water
+        4. Mix noodles, cheese, and butter
+\end{verbatim}
+
+\par{
+Commit the change. Now we're going to think a little bit about the macaroni
+recipe while we start working on the rice recipe. We're going to switch to the
+master branch, using the same checkout command we did earlier. From there,
+create a new branch. There is a handy shortcut to create the branch and
+immediately check it out:
+}
+
+\begin{verbatim}
+git checkout -b rice
+\end{verbatim}
+
+\par{
+If you check the log, you will see that \verb+rice+ is sharing a tip with
+\verb+master+. \verb+macaroni+ is no longer sharing a tip with master,
+however. If you examine the files, you will see that your changes have gone
+away. No need to fear, however, you can simply checkout between the files to
+verify that those changes still exist in \verb+macaroni+. Once you're
+satisfied that your very detailed and useful macaroni recipe is recorded, go
+ahead and add ingredients for the rice (this is also a useful recipe).
+}
+
+\begin{verbatim}
+    Ingredients:
+        Water
+        Rice
+\end{verbatim}
+
+\par{
+Commit these changes.
+}
+
+\par{
+Now, we've made changes in two branches apart from master. It would be neat to
+visualize them like the figure from earlier. 
+I know what you're thinking: now would be a great time for a
+GUI, right? The command line can't draw graphs. \emph{Au contraire}, reader. 
+Run the following command and prepare to have your mind blown:
+}
+
+\begin{verbatim}
+git log --all --graph --decorate --oneline
+\end{verbatim}
+
+\par{
+Similarly to before, you can limit it to a certain number of previous commits.
+\verb+all+ just indicates that you would like to see all branches,
+\verb+graph+ means what you just saw, and \verb+decorate+ is essential to make
+the graph legible; same for \verb+oneline+; entire commit data is really hard
+to parse in a graph. It probably wouldn't hurt to make an alias for this in
+your git profile.
+}
+
+\par{
+We can now see that rice's tip is ahead of macaroni's, but that they share a
+common ancestor in the master branch, where the tip is. 
+Now that we've put our ingredients in
+for rice, and we've poked around on the graph, let's get macaroni merged in.
+}
+
+\par{
+When we go to review our macaroni recipe before merging it, we realize that we
+left out some very helpful information! People have no idea how long it will
+take to make their macaroni. We'll call it 15 minutes, that's what it takes
+me, anyway. So add a commit with the following:
+}
+
+\begin{verbatim}
+    Cook Time: 15 minutes
+\end{verbatim}
+
+\par{
+After checking our graph log one more time and noting that now macaroni is
+ahead of rice, it's time to merge. Get back to the master branch, then run
+}
+
+\begin{verbatim}
+git merge macaroni
+\end{verbatim}
+
+\par{
+\verb+git+ notifies you that it's fast-forwarding, and notes each file and the
+changes in them, noting the total number of lines of insertions. There are no
+other files and no deletions in this case, but when merging it will indicate
+those as well. Check out the graph again and not that now \verb+master+ is
+ahead of \verb+rice+. We don't really want to keep around the macaroni branch
+since we're done with the macaroni recipe, and it's merged into master. You
+can delete the branch via
+}
+
+\begin{verbatim}
+git branch -d macaroni
+\end{verbatim}
+
+\par{
+Note that if you try this on the rice branch, \verb+git+ will protect you from
+yourself, and ask you if you're sure since it isn't merged into the current
+branch.
+\verb+git+ is smart enough to know that you would be losing easy access to
+your commits.
+You could override that behavior with the \verb+-D+ option, but don't do
+that-- I would like for you to keep your work so far.
+Now let's do some more work on our rice branch, and add some cook times for it.
+Add and commit the following:
+}
+
+\begin{verbatim}
+    Directions:
+        1. Add rice and water to rice cooker
+        2. Turn on rice cooker
+\end{verbatim}
+
+\par{
+You will note that git still shows you the last common ancestor of \verb+rice+
+and, implicitly, the \verb+macaroni+ branch. You're not sure how long the rice
+will take, so you move on to chocolate chip cookies. Uh-oh! You can't check
+out master, because that tip now contains contents from the macaroni recipe,
+and it's bad practice to introduce unnecessary interdependencies like that. 
+Instead, you can actually checkout the last common ancestor of all branches.
+Find that on the graph, and check out that commit hash. You will be warned
+that you are in a ``detached head'' state. If you make any commits in that
+state, they will be lost the second you change branches. That's not good! But
+fortunately, there's a simple solution: you can just branch off of that
+commit. That's what we came here to do anyway, so branch off of the commit.
+}
+
+\par{Similar to before, we're going to make ingredients and directions commits
+separately.}
+
+\begin{verbatim}
+    Ingredients:
+        Sugar
+        Flour
+        Chocolate Chips
+        Water
+        Butter
+\end{verbatim}
+
+and
+
+\begin{verbatim}
+    Directions:
+        1. Mix ingredients
+        2. Shape dough into 1 oz circles
+        3. Bake at 350F
+\end{verbatim}
+
+\par{
+Commit each set of changes individually, then look at the log as a graph. You
+will see that both rice and cookies share a common ancestor, which is correct.
+Fantastic! You realize now that rice takes about a half hour, so we can add
+the cook time to the rice. Checkout that branch and commit the following:
+}
+
+\begin{verbatim}
+    Cook Time: 30 minutes
+\end{verbatim}
+
+\par{
+Review the graph again, noting that now rice is ahead of cookies. As you did
+with macaroni, merge the rice branch into master and review the graph. You
+will be presented with an editor window asking you to make a commit. This is
+because one of your commits in \verb+rice+ is behind a commit that was merged
+in from \verb+macaroni+ after their mutual ancestor was committed. Take a
+moment to make sure you understand that. If you look at
+Figure \ref{fig:branching_recipe}, you can see that commit D of \verb+rice+ is
+behind of commit E \verb+macaroni+, and that their last common ancestor was
+before any commits in \verb+macaroni+ at commit A. Therefore, git wants you to
+make a commit to make it possible to untangle the branches and double-check
+that this is what you want to do. The default message, ``Merge branch
+\'rice\''', is a fairly sensible thing to accept, so go ahead and merge it.
+Just like before, it will note the file change and its insertions. When you
+look at the file, you will see that rice recipe was seamlessly integrated into
+the file on top of the macaroni recipe. View the graph log again. You will see
+that the rice branch's merge also included the macaroni branch merge because
+one commit fused both merges into master. This is very good, because it makes
+it easy to retrieve prior states of the recipe file. Things as they are now
+reflect the commit I' in Figure \ref{fig:branching_recipe}.
+}
+
+\par{
+Check out the \verb+cookies+ branch, then add and commit the following:
+}
+
+\begin{verbatim}
+    Bake Time: 10 minutes
+\end{verbatim}
+
+\par{
+Merge the changes into master. Again, you'll need to make a commit because the
+commits in \verb+cookies+ were interspersed with commits in \verb+rice+. Use
+the default commit message. Now when you view the graph, you will see that the
+cookies branch follows the rice branch due to the commit interspersion, and
+the previous branching display is retained between rice and macaroni. Delete
+any non-master branches.
+}
+
+\par{
+Let's say you decide to release the recipes in this state, as a kind of Beta
+release. You can actually tag this recent commit, so it's easy to find later,
+via
+}
+
+\begin{verbatim}
+git tag -a v0.1 -m "beta recipe release"
+\end{verbatim}
+
+\par{
+This will tag the latest commit with an ``annotated'' tag: one that can be
+pushed to remotes. This isn't useful to us yet, but it will be in the future.
+You can also search for existing tags. We only have one on this repo, so it
+will be boring, but you can run
+}
+
+\begin{verbatim}
+git tag
+\end{verbatim}
+
+\par{
+Our friendly 0.1 tag will show up. You can get more information on the
+specific commit of a tag via
+}
+
+\begin{verbatim}
+git show tag_name
+\end{verbatim}
+
+\par{
+If you run that for our tag, you'll see the full commit log for that tag. You
+can add the \verb+-s+ flag to give a more abbreviated set of information like
+you'd see for a standard log. Tags are often used to indicate releases or
+important commits for future reference. When listing tags, you can also do
+searches with the * wildcard.
+}
+
+\par{
+These are the basics. Even with just this knowledge, your ability to manage
+changes is drastically increased. They encourage you to create new branches
+with the knowledge that its contents will not impact other branches, while
+still retaining the ability to easily merge work together. Make branches
+frequently to explore new features, bug fixes, or even documentation rewrites.
+The cost is almost nothing! Just make sure to periodically clean out stale
+branches. 
+}
+
+\section{Remotes}
+\par{
+Remotes are the easiest way to distribute a version control system. Users will
+have a local copy, and also a reference copy located on a server somewhere.
+Most commonly, it is hosted on GitHub or GitLab. We will use GitHub for these
+exercises. Go to the repository you cloned in Chapter 1. Inside that
+repository, run the following:
+}
+
+\begin{verbatim}
+git remote show
+\end{verbatim}
+
+\par{
+\verb+git+ should report back to you that it has a remote called
+\verb+origin+. This is commonly the original repository that you cloned,
+hosted somewhere. Cloned repositories should have this set up by default on
+GitHub, without your intervention. Let's say you disagree with the way this
+repository is set up, or you would like to manage changes under your own
+independent profile. You can create what's called a \emph{fork}. This is where
+you create a diverging repository on your own profile. It's easy to do on
+GitHub. Go to the class repository
+\href{https://github.com/jbteves/test_git}{here} and click on ``Fork'' at the
+top right. This will create a version of the repo, complete with all history,
+on your own personal profile. You can then create and merge your own branches
+without impacting the original repository created for this boot camp. 
+}
+
+\par{
+Once you fork your project, you should see a link for cloning. This link can
+also be used to add a remote. Get the link for your fork, and then run
+}
+
+\begin{verbatim}
+git remote add fork my-fork-url
+\end{verbatim}
+
+\par{
+This should add a brand new remote. You can see all of your remotes with more
+detail by running 
+}
+
+\begin{verbatim}
+git remote -v
+\end{verbatim}
+
+\par{
+Now you'll need to use your remotes to keep your branches up to date (this
+will effectively work by using merge). Let's say that you would like to make a
+new branch and set it to use your fork as an ``upstream:'' that is, where your
+commits will go when you push them. Create a branch as normal. HOWEVER, it is
+often useful to put your initials as the start of the branch so that other
+developers can identify who the branch author is. Therefore, if you make a
+branch called \verb+add_addition+, it behooves you to call it 
+\verb+JT_add\_addition+
+if your initials are JT. If not, please substitute your own initials.
+Once you've made this branch, you can make some change and commit it-- it's
+quite irrelevant what the change is because your repository is independent of
+the class repository. In order to send this change to your remote repository,
+run
+}
+
+\begin{verbatim}
+git push --set-upstream remote-name branch-name
+\end{verbatim}
+
+\par{
+Now your branch will contain the ability to merge changes from the remote
+reference. This is difficult to demonstrate on your own, however. The one
+thing you can do is to continue adding commits and pushing them via
+}
+
+\begin{verbatim}
+git push
+\end{verbatim}
+
+\par{
+Push a commit or two to the repository, and then do a hard reset to at least
+one commit before the last push. Attempt to push. You will get an error
+message: ``error: failed to push some refs'' \ldots ``Updates were rejected
+because the tip of your current branch is behind its remote counterpart''. 
+This error occurs because you have attempt to modify the history of the branch
+that you're pushing to. \verb+git+ doesn't like when you do that, so it is
+giving you an error. You can correct the error by pulling the changes, and
+then attempting to push a new commit. You can pull one of two ways:
+
+\begin{verbatim}
+git fetch remote-name branch-name
+git merge remote-name/branch-name
+\end{verbatim}
+
+\par{
+which will give you clear indications of when things are out of date, and give
+you standard merge errors, or
+}
+
+\begin{verbatim}
+git pull
+\end{verbatim}
+
+\par{
+which is less typing and typically works fine, but can be a bit of a hassle
+when there are more conflicts (see next section). Once you've gotten your
+local branch back up to date, you can continue making commits. Note that you
+could even make commits which reverse the changes you don't like and then push
+them; the main idea is to get you back to a point where you have a common
+history with the branch. 
+}
+
+\par{
+It is my duty to inform you that you can in fact bypass the safeguards
+described above. However, allow me to warn you now in capital letters that
+this action has a very high probability of making you-- you know what's
+coming--
+A SINNER IN THE HANDS OF AN ANGRY SYSTEM.
+Instead of resolving conflicts and making sure that your branch has a state
+where it agrees with the remote, you can simply run
+}
+
+\begin{verbatim}
+git push -f
+\end{verbatim}
+
+\par{
+This is a force push, and IT IS A BAD IDEA. Why? It will amend history that,
+on a shared repository, other people may have branched from, resulting in an
+onslaught of merge conflicts as they attempt to reconcile this change in
+history. Additionally, it makes it extremely hard to recover the lost commits
+without more bizarre maneuvering. In short, don't do it, or you will be a
+sinner in the hands of an angry system. To help stress how against force
+pushing I am, I will go as far as to say that unless you have a very
+compelling reason to do so (sometimes when merging repositories it is
+required) I will refuse to help you, for straying from the righteous path
+provided for you here and in the next section, which covers conflicts when
+merging in more depth.
+}
+
+\section{Conflicts}
+\par{
+Conflicts in \verb+git+ are inevitable. At some point, some programmer will
+push a change which conflicts with a change made ``after'' theirs
+chronologically, and the difference will need to be reconciled. For an
+ultra-simple example, we will return to the \verb+HelloWorld+ repository.
+}
+
+\par{
+Create a new branch, maybe called \verb+merge_conflict+, based off of the tip
+of master. We will assume that while working on the recipe, you discover that
+in your rice cooker, it is in fact only 20 minutes to get rice cooked. Go
+ahead, make and commit that change in your branch, then check out master. 
+Now, let's say that you pull from a remote and there is now a commit where
+another maintainer has changed the cook time up to 35 minutes, because they
+have a much slower rice cooker (or no rice cooker at all). Because there is no
+way to do this automatically, just manually edit the rice cook time directly
+on the master branch and commit it. However, consider that this is equivalent
+to pulling from a remote repository and seeing the new commit-- this is a
+common occurrence. 
+}
+
+\par{
+For expediency, we will say that you didn't pay close attention when fetching
+and merging or pulling, and now you go to merge your own changes into master.
+Attempt to merge your branch into master. You get an angry message:
+``CONFLICT (content): Merge conflict in recipe.txt. Automatic merge failed;
+fix conflicts and then commit the result.''
+Unlike interactive programs, a merge conflict will not trigger the editor.
+This is because some people prefer to use a more comprehensive IDE to debug
+during a merge conflict. Not me, though. I love a good old CLI text editor.
+Fire up a text editor and load \verb+recipe.txt+. 
+In the center of the file, you see this bizarre addition: 
+}
+
+\begin{verbatim}
+<<<<<<< HEAD
+    Cook time: 35 minutes
+=======
+    Cook time: 20 minutes
+>>>>>>> merge_conflict
+\end{verbatim}
+
+\par{
+This is telling you that a line or hunk has two versions. It's now up to you
+to merge them manually by picking and choosing which pieces survive. The top
+one is ``HEAD'', where we are now. The bottom one is ``merge\_conflict'', the
+name of the branch we've attempted to merge. Resolve the conflict by turning
+the $<<$ and $>>$ enclosed space into a resolution; just list a range of 20-35
+minutes instead. When you're done, delete the lines containing HEAD and the
+branch name. Stage the change and commit it, noting a merge conflict in the
+message. Describe your resolution strategy. When you finish the commit,
+\verb+git+ will note that the conflict is resolved. If the commit did not
+properly get rid of the notation above, then it will not resolve the conflict.
+Add another commit to correct this if it happens.
+}
+
+\par{
+It's also possible to get this when ``rebasing,'' a history amendment strategy
+where a set of commits is played on top of other commits to make it seem like
+one continuous line of commits instead of a merge. We could have done this
+with the original recipe, for example. For a simple illustration, we will
+create another branch, put a few commits on it, and then rebase it onto
+master. Go to the recipe and add a few commits to add a recipe for corn on the
+cob.
+}
+
+\begin{verbatim}
+Corn on the Cob:
+    Ingredients:
+        Corn
+        Butter
+    Directions:
+        1. Place corn on a hot grill until browned
+        2. Slather with butter
+    Cook time:
+        10 minutes
+\end{verbatim}
+
+\par{
+Commit it in stages like in the first section, then run}
+
+\begin{verbatim}
+git rebase master
+\end{verbatim}
+
+\par{
+You will see that your commits are already up to date. Now create a new
+branch, springing from the same common ancestor commit as the corn branch, and
+add a S'mores recipe. Immediately merge it into master. 
+}
+
+\begin{verbatim}
+S'mores:
+    Ingredients:
+        Graham Crackers
+        Marshmallow
+        Chocolate
+    Directions:
+        1. Light marshmallow on fire
+        2. Squish marshmallow and chocolate between two crackers
+\end{verbatim}
+
+\par{
+Now attempt to rebase the corn branch onto master. You will get another
+failure, because the s'mores recipe is in conflict with your corn recipe; only
+one of them can go directly below chocolate chip cookies. Similar to before,
+resolve the conflict in a text editor and make a commit. This time, though,
+the bottom message will be your last corn commit and the top will be whatever
+the tip of master is. Resolve the conflict as before, and then use \verb+git+
+add+ to add the resolution. Rebase will now require you to go through each
+commit and resolve the conflict that would be introduced by playing the corn
+commits over the top of the s'mores commits. Once you've finished resolving
+all conflicts, the rebase will be complete. You can merge the changes into
+master. If you look at the git log graph, you will see that the rebased branch
+appears to be ``in line'' with the previous commits instead of branched out.
+This can be useful if you are trying to condense work from many branches, but
+is ultimately much more complex than simply merging. It will also amend commit
+history, so branches which others may have branched off of should never be
+rebased; it will cause them a huge merge conflict headache. 
+}
